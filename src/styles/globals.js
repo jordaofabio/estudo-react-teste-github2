@@ -27,4 +27,9 @@ body, input, button {
 button {
   cursor: pointer;
 }
+
+a {
+      color: #3b38d1;
+      text-decoration: none;
+}
 `;

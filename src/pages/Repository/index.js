@@ -1,8 +1,10 @@
 import React, { Component } from 'react';
+import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import api from '../../services/api';
+import Container from '../../components/Container';
 
-// import { Container } from './styles';
+import { Loading, Owner } from './styles';
 
 class Repository extends Component {
   static propTypes = {
@@ -13,7 +15,6 @@ class Repository extends Component {
     }),
   };
   state = {
-    repositoryName: '',
     repository: {},
     issues: [],
     loading: true,
@@ -21,7 +22,6 @@ class Repository extends Component {
   async componentDidMount() {
     const { match } = this.props;
     const repositoryName = decodeURIComponent(match.params.repository);
-    this.setState({ repositoryName });
 
     const [repository, issues] = await Promise.all([
       api.get(`/repos/${repositoryName}`),
@@ -41,8 +41,22 @@ class Repository extends Component {
   }
 
   render() {
-    const { repositoryName } = this.state;
-    return <h1>Repository: {repositoryName} </h1>;
+    const { repository, issues, loading } = this.state;
+
+    if (loading) {
+      return <Loading>Carregando</Loading>;
+    }
+
+    return (
+      <Container>
+        <Owner>
+          <Link to="/">Voltar aos repositórios</Link>
+          <img src={repository.owner.avatar_url} alt={repository.owner.login} />
+          <h1>{repository.name}</h1>
+          <p>{repository.description}</p>
+        </Owner>
+      </Container>
+    );
   }
 }
 
