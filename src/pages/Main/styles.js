@@ -1,15 +1,18 @@
 import styled, { keyframes, css } from 'styled-components';
 
-export const Form = styled.form`
+export const Form = styled.form.attrs((props) => ({
+  invalid: props.invalid,
+}))`
   margin-top: 30px;
   display: flex;
   flex-direction: row;
 
   input {
     flex: 1;
-    border: 1px solid #eee;
+    border: ${(props) => (!props.invalid ? '1px solid #eee' : '1px solid red')};
     padding: 10px 15px;
     font-size: 16px;
+    background: ${(props) => (!props.invalid ? '#FFF' : '#ffd7d4')};
   }
 `;
 

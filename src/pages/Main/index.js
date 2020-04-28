@@ -9,8 +9,9 @@ import { Form, SubmitButton, List } from './styles';
 export default class Main extends Component {
   state = {
     newRepository: '',
-    repositories: [],
+    repositories: [{ name: 'jordaofabio/teste-github2' }],
     loading: false,
+    invalid: false,
   };
 
   componentDidMount() {
@@ -33,28 +34,37 @@ export default class Main extends Component {
 
   handleSubmit = async (e) => {
     e.preventDefault();
+    if (!this.state.newRepository) {
+      this.setState({ invalid: true });
+      return;
+    }
 
     this.setState({ loading: true });
 
-    const { newRepository, repositories } = this.state;
+    try {
+      const { newRepository, repositories } = this.state;
 
-    const response = await api.get(`/repos/${newRepository}`);
+      const response = await api.get(`/repos/${newRepository}`);
+      const data = {
+        name: response.data.full_name,
+      };
 
-    const data = {
-      name: response.data.full_name,
-    };
-
-    this.setState({
-      repositories: [...repositories, data],
-      newRepository: '',
-      loading: false,
-    });
-
-    console.log(response.data);
+      this.setState({
+        invalid: false,
+        repositories: [...repositories, data],
+        newRepository: '',
+        loading: false,
+      });
+    } catch (err) {
+      this.setState({
+        invalid: true,
+        loading: false,
+      });
+    }
   };
 
   render() {
-    const { newRepository, loading, repositories } = this.state;
+    const { newRepository, loading, repositories, invalid } = this.state;
     return (
       <Container>
         <h1>
@@ -62,10 +72,14 @@ export default class Main extends Component {
           Repositórios
         </h1>
 
-        <Form onSubmit={this.handleSubmit}>
+        <Form onSubmit={this.handleSubmit} invalid={invalid}>
           <input
             type="text"
-            placeholder="Adicionar repositório"
+            placeholder={
+              !invalid
+                ? 'Adicionar repositório'
+                : 'ex.: jordaofabio/teste-github2'
+            }
             value={newRepository}
             onChange={this.handleInputChange}
           />
